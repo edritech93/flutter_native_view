@@ -17,32 +17,94 @@ class _NativeViewExampleState extends State<NativeViewExample> {
     // This is used in the platform side to register the view.
     const String viewType = '<platform-view-type>';
     // Pass parameters to the platform side.
-    const Map<String, dynamic> creationParams = <String, dynamic>{};
+    final Map<String, dynamic> creationParams = <String, dynamic>{};
 
-    return PlatformViewLink(
-      viewType: viewType,
-      surfaceFactory:
-          (BuildContext context, PlatformViewController controller) {
-        return AndroidViewSurface(
-          controller: controller as AndroidViewController,
-          gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
-          hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return PlatformViewLink(
+          viewType: viewType,
+          surfaceFactory:
+              (BuildContext context, PlatformViewController controller) {
+            return AndroidViewSurface(
+              controller: controller as AndroidViewController,
+              gestureRecognizers: const <
+                  Factory<OneSequenceGestureRecognizer>>{},
+              hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+            );
+          },
+          onCreatePlatformView: (PlatformViewCreationParams params) {
+            return PlatformViewsService.initSurfaceAndroidView(
+              id: params.id,
+              viewType: viewType,
+              layoutDirection: TextDirection.ltr,
+              creationParams: creationParams,
+              creationParamsCodec: const StandardMessageCodec(),
+              onFocus: () {
+                params.onFocusChanged(true);
+              },
+            )
+              ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+              ..create();
+          },
         );
-      },
-      onCreatePlatformView: (PlatformViewCreationParams params) {
-        return PlatformViewsService.initSurfaceAndroidView(
-          id: params.id,
+
+      case TargetPlatform.iOS:
+        return UiKitView(
           viewType: viewType,
           layoutDirection: TextDirection.ltr,
           creationParams: creationParams,
           creationParamsCodec: const StandardMessageCodec(),
-          onFocus: () {
-            params.onFocusChanged(true);
-          },
-        )
-          ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
-          ..create();
-      },
-    );
+        );
+
+      default:
+        throw UnsupportedError('Unsupported platform view');
+    }
   }
+
+  // Widget build(BuildContext context) {
+  //   // This is used in the platform side to register the view.
+  //   const String viewType = '<platform-view-type>';
+  //   // Pass parameters to the platform side.
+  //   final Map<String, dynamic> creationParams = <String, dynamic>{};
+
+  //   return UiKitView(
+  //     viewType: viewType,
+  //     layoutDirection: TextDirection.ltr,
+  //     creationParams: creationParams,
+  //     creationParamsCodec: const StandardMessageCodec(),
+  //   );
+  // }
+
+  // Widget build(BuildContext context) {
+  //   // This is used in the platform side to register the view.
+  //   const String viewType = '<platform-view-type>';
+  //   // Pass parameters to the platform side.
+  //   const Map<String, dynamic> creationParams = <String, dynamic>{};
+
+  //   return PlatformViewLink(
+  //     viewType: viewType,
+  //     surfaceFactory:
+  //         (BuildContext context, PlatformViewController controller) {
+  //       return AndroidViewSurface(
+  //         controller: controller as AndroidViewController,
+  //         gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
+  //         hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+  //       );
+  //     },
+  //     onCreatePlatformView: (PlatformViewCreationParams params) {
+  //       return PlatformViewsService.initSurfaceAndroidView(
+  //         id: params.id,
+  //         viewType: viewType,
+  //         layoutDirection: TextDirection.ltr,
+  //         creationParams: creationParams,
+  //         creationParamsCodec: const StandardMessageCodec(),
+  //         onFocus: () {
+  //           params.onFocusChanged(true);
+  //         },
+  //       )
+  //         ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+  //         ..create();
+  //     },
+  //   );
+  // }
 }
