@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_native_view/native_view_example.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -12,9 +13,11 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Home')),
-      body: Column(
-        children: [Text('body')],
-      ),
+      body: Container(
+          padding: const EdgeInsets.all(16.0),
+          height: null,
+          width: null,
+          child: const NativeViewExample()),
     );
   }
 }
